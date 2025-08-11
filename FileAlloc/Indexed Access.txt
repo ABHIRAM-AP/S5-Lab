@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+struct file {
+    int file_no;
+    int index_block;
+    int blocks[20];
+    int block_count;
+    int allocated;
+};
+typedef struct file FILES;
+
+int memory[MAX];
+
+void initializeMemory() {
+    for (int i = 0; i < MAX; i++)
+        memory[i] = -1;
+}
+
+int isFree(int block) {
+    return memory[block] == -1;
+}
+
+void allocateFiles(FILES *files, int total) {
+    for (int i = 0; i < total; i++) {
+        FILES *f = &files[i];
+
+        printf("\nEnter File Number: ");
+        scanf("%d", &f->file_no);
+
+        printf("Enter Index Block: ");
+        scanf("%d", &f->index_block);
+
+        if (!isFree(f->index_block)) {
+            printf("Index Block %d already allocated. File %d can't be allocated.\n", f->index_block, f->file_no);
+            f->allocated = 0;
+            continue;
+        }
+
+        printf("Enter number of blocks: ");
+        scanf("%d", &f->block_count);
+
+        printf("Enter %d block numbers: ", f->block_count);
+        int valid = 1;
+        for (int j = 0; j < f->block_count; j++) {
+            scanf("%d", &f->blocks[j]);
+            if (!isFree(f->blocks[j])) {
+                valid = 0;
+            }
+        }
+
+        if (!valid) {
+            printf("One or more data blocks already allocated. File %d can't be stored.\n", f->file_no);
+            f->allocated = 0;
+        } else {
+            memory[f->index_block] = f->file_no;
+            for (int j = 0; j < f->block_count; j++)
+                memory[f->blocks[j]] = f->file_no;
+            f->allocated = 1;
+            printf("File %d allocated successfully.\n", f->file_no);
+        }
+    }
+}
+
+void displayFiles(FILES *files, int total) {
+    printf("\nFile\tIndex\tBlocks\n");
+    for (int i = 0; i < total; i++) {
+        FILES *f = &files[i];
+        if (f->allocated) {
+            printf("%d\t%d\t", f->file_no, f->index_block);
+            for (int j = 0; j < f->block_count; j++)
+                printf("%d ", f->blocks[j]);
+            printf("\n");
+        }
+    }
+}
+
+int main() {
+    int total;
+    FILES *files = malloc(20 * sizeof(FILES)); // dynamic allocation
+
+    initializeMemory();
+
+    printf("Enter number of files: ");
+    scanf("%d", &total);
+
+    allocateFiles(files, total);
+    displayFiles(files, total);
+
+    free(files); 
+    return 0;
+}

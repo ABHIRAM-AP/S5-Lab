@@ -1,0 +1,132 @@
+#include <stdio.h>
+#define MAX 100
+
+struct file
+{
+    int file_no;
+    int start;
+    int length;
+    int alloc;
+};
+typedef struct file FILES;
+
+void readDetails(FILES a[], int total)
+{
+    for (int i = 0; i < total; i++)
+    {
+        printf("\nEnter file number: ");
+        scanf("%d", &a[i].file_no);
+        printf("Enter the starting block of file %d: ", a[i].file_no);
+        scanf("%d", &a[i].start);
+        printf("Enter the total blocks in file %d: ", a[i].file_no);
+        scanf("%d", &a[i].length);
+        a[i].alloc = -1; // -1 means not allocated
+    }
+}
+
+void SequentialAccess(FILES a[], int arr[], int total)
+{
+    for (int i = 0; i < total; i++)
+    {
+        int start = a[i].start;
+        int end = start + a[i].length;
+
+        // Check if all required blocks are free
+        int canAllocate = 1;
+        if (end > MAX)
+        {
+            printf("File %d exceeds memory limit.\n", a[i].file_no);
+            continue;
+        }
+
+        for (int k = start; k < end; k++)
+        {
+            if (arr[k] != -1)
+            {
+                canAllocate = 0;
+                break;
+            }
+        }
+
+        if (canAllocate)
+        {
+            for (int k = start; k < end; k++)
+            {
+                arr[k] = a[i].file_no;
+            }
+            a[i].alloc = 1;
+            printf("File %d allocated from block %d to %d\n", a[i].file_no, start, end - 1);
+        }
+        else
+        {
+            printf("File %d cannot be allocated due to memory block conflict.\n", a[i].file_no);
+        }
+    }
+}
+
+void printBorder(FILES f[], int i)
+{
+    for (int j = 0; j < f[i].length; j++)
+    {
+        printf("+-----");
+    }
+    printf("+\n");
+
+    for (int j = 0; j < f[i].length; j++)
+    {
+        printf("| %3d ", f[i].start + j);
+    }
+    printf("|\n");
+
+    // Bottom border
+    for (int j = 0; j < f[i].length; j++)
+    {
+        printf("+-----");
+    }
+    printf("+\n");
+}
+
+void searchFile(FILES f[], int fileNum, int total)
+{
+    int found = 0;
+    for (int i = 0; i < total; i++)
+    {
+        if (f[i].alloc == 1 && f[i].file_no == fileNum)
+        {
+            found = 1;
+            printf("\nFileNum: %d\n", f[i].file_no);
+            printf("Length: %d\n", f[i].length);
+            printf("Blocks Occupied:\n");
+            printBorder(f, i);
+            break;
+        }
+    }
+    if (!found)
+    {
+        printf("\nFile %d not found or not allocated.\n", fileNum);
+    }
+}
+void initMemory(int arr[])
+{
+    for (int i = 0; i < MAX; i++)
+        arr[i] = -1;
+}
+int main()
+{
+    FILES f[20];
+    int total = 0;
+    int arr[MAX];
+    initMemory(arr);
+
+    printf("Enter total number of files: ");
+    scanf("%d", &total);
+
+    readDetails(f, total);
+    SequentialAccess(f, arr, total);
+    int fileNum = 0;
+    printf("Enter filenum");
+    scanf("%d", &fileNum);
+    searchFile(f, fileNum, total);
+
+    return 0;
+}

@@ -1,0 +1,190 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_USERS 5
+#define MAX_FILES 5
+
+struct dir{
+    char dname[10];
+    char fname[MAX_FILES][10];
+    int file_count;
+};
+
+typedef struct dir USER;
+
+void createUser(USER users[],int *userCount)
+{
+    if(*userCount>=MAX_USERS)
+    {
+        printf("MAX users reached\n");
+        return;
+    }
+    printf("Enter user name:");
+    scanf("%s",users[*userCount].dname);
+    users[*userCount].file_count =0;
+    (*userCount)++;
+    printf("User Created Successfully\n");
+}
+
+int findUser(USER users[], char userName[],int userCount)
+{
+    for(int i=0;i<userCount;i++)
+    {
+        if(strcmp(users[i].dname, userName)==0)return i;
+    }
+    return -1;
+}
+
+void createFile(USER *user) {
+    char fname[10];
+
+    if (user->file_count >= MAX_FILES) {
+        printf("Max file limit reached for user '%s'.\n", user->dname);
+        return;
+    }
+
+    printf("Enter file name: ");
+    scanf("%s", fname);
+
+    // Check for duplicates
+    for (int i = 0; i < user->file_count; i++) {
+        if (strcmp(user->fname[i], fname) == 0) {
+            printf("File already exists.\n");
+            return;
+        }
+    }
+
+    strcpy(user->fname[user->file_count], fname);
+    user->file_count++;
+
+    printf("File '%s' created under user '%s'.\n", fname, user->dname);
+}
+
+void deleteFile(USER *user)
+{
+    char fname[10];
+    if(user->file_count == 0)
+    {
+        printf("No files to delete for user %s",user->dname);
+        return;
+    }
+    printf("Enter the file to delete:");
+    scanf("%s",fname);
+    
+    for(int i=0;i<user->file_count;i++)
+    {
+        if(strcmp(user->fname[i],fname) == 0)
+        {
+            strcpy(user->fname[i], user->fname[user->file_count-1]);
+            user->file_count--;
+            printf("File %s Deleted from %s\n",fname,user->dname);
+            return;
+        }
+    }
+    printf("File Not found\n");
+}
+
+void displayFiles(USER users[],int userCount)
+{
+    printf("Directory \t Files\n");
+    for(int i=0;i<userCount;i++)
+    {
+        if(users[i].file_count == 0) 
+        {
+            printf("No Files\n");
+            return;
+        }
+        printf("\n%s\t\t",users[i].dname);
+        for(int j=0;j<users[i].file_count;j++)
+        {
+            printf("\t%s",users[i].fname[j]);
+        }
+    }
+}
+
+void searchFile(USER *user)
+{
+    char fname[10];
+  
+    printf("Enter file name to search: ");
+    scanf("%s", fname);
+
+    for (int i = 0; i < user->file_count; i++) {
+        if (strcmp(user->fname[i], fname) == 0) {
+            printf("File '%s' found under user '%s'.\n", fname, user->dname);
+            return;
+        }
+    }
+
+    printf("File '%s' not found under user '%s'.\n", fname,  user->dname);
+}
+
+void takeUserName(char *uname)
+{
+    printf("Enter user name:");
+    scanf("%s",uname);
+}
+
+int main() {
+    USER users[MAX_FILES];
+    int userCount=0, choice = 0;
+    char uname[20];
+
+ while (1) {
+        printf("\n-------- Two-Level Directory Menu --------\n");
+        printf("1. Create User Directory\n");
+        printf("2. Create File\n");
+        printf("3. Delete File\n");
+        printf("4. Search File\n");
+        printf("5. Display Files\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+           case 1:
+           createUser(users,&userCount);
+           break;
+           
+           case 2:
+           takeUserName(uname);
+           int idx = findUser(users, uname, userCount);
+                if (idx != -1)
+                    createFile(&users[idx]);
+                else
+                    printf("User not found.\n");
+            break;
+            
+            case 3:
+            takeUserName(uname);
+              idx = findUser(users, uname, userCount);
+                if (idx != -1)
+                    deleteFile(&users[idx]);
+                else
+                    printf("User not found.\n");
+            break;
+            case 4: 
+            takeUserName(uname);
+             idx = findUser(users, uname, userCount);
+                if (idx != -1)
+                    searchFile(&users[idx]);
+                else
+                    printf("User not found.\n");
+            break;
+            
+            case 5:
+             displayFiles(users,userCount);
+            break;
+        
+            case 6:
+                printf("Exited\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+
+    return 0;
+}

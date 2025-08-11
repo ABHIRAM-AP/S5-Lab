@@ -1,0 +1,216 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_DIRS 5
+#define MAX_SUBDIRS 5
+#define MAX_FILES 5
+
+struct dir {
+    char dirName[20];
+    char subDirName[MAX_SUBDIRS][20];
+    char files[MAX_SUBDIRS][MAX_FILES][20];
+    int subDirCount;
+    int fileCount[MAX_SUBDIRS];
+};
+
+typedef struct dir FS;
+
+void createDirectory(FS dirs[], int *dirCount) {
+    if (*dirCount >= MAX_DIRS) {
+        printf("Max directories reached!\n");
+        return;
+    }
+    printf("Enter directory name: ");
+    scanf("%s", dirs[*dirCount].dirName);
+    dirs[*dirCount].subDirCount = 0;
+    for (int i = 0; i < MAX_SUBDIRS; i++)
+        dirs[*dirCount].fileCount[i] = 0;
+
+    (*dirCount)++;
+    printf("Directory created successfully!\n");
+}
+
+int findDirectory(FS dirs[], int dirCount, char name[]) {
+    for (int i = 0; i < dirCount; i++) {
+        if (strcmp(dirs[i].dirName, name) == 0) return i;
+    }
+    return -1;
+}
+
+void takeSubDirectoryName(char *subname)
+{
+      printf("Enter subdirectory name: ");
+    scanf("%s", subname);
+}
+void takeFileName(char *fname)
+{
+      printf("Enter file name: ");
+    scanf("%s", fname);
+}
+
+void createSubDirectory(FS *dir) {
+    if (dir->subDirCount >= MAX_SUBDIRS) {
+        printf("Max subdirectories reached!\n");
+        return;
+    }
+
+    printf("Enter subdirectory name: ");
+    scanf("%s", dir->subDirName[dir->subDirCount]);
+    dir->fileCount[dir->subDirCount] = 0;
+    dir->subDirCount++;
+    printf("Subdirectory created!\n");
+}
+
+int findSubDir(FS *dir, char name[]) {
+    for (int i = 0; i < dir->subDirCount; i++) {
+        if (strcmp(dir->subDirName[i], name) == 0) return i;
+    }
+    return -1;
+}
+
+void createFile(FS *dir) {
+    char subname[20], fname[20];
+    takeSubDirectoryName(subname);
+    int idx = findSubDir(dir, subname);
+    if (idx == -1) {
+        printf("Subdirectory not found!\n");
+        return;
+    }
+    if (dir->fileCount[idx] >= MAX_FILES) {
+        printf("Max files reached in this subdirectory.\n");
+        return;
+    }
+    takeFileName(fname);
+    for (int j = 0; j < dir->fileCount[idx]; j++) {
+        if (strcmp(dir->files[idx][j], fname) == 0) {
+            printf("File already exists.\n");
+            return;
+        }
+    }
+    strcpy(dir->files[idx][dir->fileCount[idx]], fname);
+    dir->fileCount[idx]++;
+    printf("File created in subdirectory '%s' of '%s'.\n", subname, dir->dirName);
+}
+
+void deleteFile(FS *dir) {
+    char subname[20], fname[20];
+    takeSubDirectoryName(subname);
+    int idx = findSubDir(dir, subname);
+
+    if (idx == -1 || dir->fileCount[idx] == 0) {
+        printf("Subdirectory not found or no files.\n");
+        return;
+    }
+
+    takeFileName(fname);
+
+    for (int j = 0; j < dir->fileCount[idx]; j++) {
+        if (strcmp(dir->files[idx][j], fname) == 0) {
+            strcpy(dir->files[idx][j], dir->files[idx][dir->fileCount[idx] - 1]); // replace with last
+            dir->fileCount[idx]--;
+            printf("File '%s' deleted.\n", fname);
+            return;
+        }
+    }
+    printf("File not found.\n");
+}
+
+void searchFile(FS *dir) {
+    char fname[20];
+   takeFileName(fname);
+
+    for (int i = 0; i < dir->subDirCount; i++) {
+        for (int j = 0; j < dir->fileCount[i]; j++) {
+            if (strcmp(dir->files[i][j], fname) == 0) {
+                printf("File '%s' found in subdirectory '%s'\n", fname, dir->subDirName[i]);
+                return;
+            }
+        }
+    }
+    printf("File '%s' not found.\n", fname);
+}
+
+void displayStructure(FS dirs[], int dirCount) {
+    printf("\n--- Hierarchical Directory Structure ---\n");
+    for (int i = 0; i < dirCount; i++) {
+        printf("Directory: %s\n", dirs[i].dirName);
+        for (int j = 0; j < dirs[i].subDirCount; j++) {
+            printf("  SubDir: %s\n", dirs[i].subDirName[j]);
+            for (int k = 0; k < dirs[i].fileCount[j]; k++) {
+                printf("    File: %s\n", dirs[i].files[j][k]);
+            }
+        }
+    }
+}
+
+int main() {
+    FS dirs[MAX_DIRS];
+    int dirCount = 0, choice;
+    char dirname[20];
+
+    while (1) {
+        printf("\n-------- Hierarchical Directory Menu --------\n");
+        printf("1. Create Directory\n");
+        printf("2. Create Subdirectory\n");
+        printf("3. Create File\n");
+        printf("4. Delete File\n");
+        printf("5. Search File\n");
+        printf("6. Display Directory Structure\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        int idx;
+
+        switch (choice) {
+            case 1:
+                createDirectory(dirs, &dirCount);
+                break;
+            case 2:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                idx = findDirectory(dirs, dirCount, dirname);
+                if (idx != -1)
+                    createSubDirectory(&dirs[idx]);
+                else
+                    printf("Directory not found.\n");
+                break;
+            case 3:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                idx = findDirectory(dirs, dirCount, dirname);
+                if (idx != -1)
+                    createFile(&dirs[idx]);
+                else
+                    printf("Directory not found.\n");
+                break;
+            case 4:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                idx = findDirectory(dirs, dirCount, dirname);
+                if (idx != -1)
+                    deleteFile(&dirs[idx]);
+                else
+                    printf("Directory not found.\n");
+                break;
+            case 5:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                idx = findDirectory(dirs, dirCount, dirname);
+                if (idx != -1)
+                    searchFile(&dirs[idx]);
+                else
+                    printf("Directory not found.\n");
+                break;
+            case 6:
+                displayStructure(dirs, dirCount);
+                break;
+            case 7:
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
