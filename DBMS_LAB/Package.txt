@@ -1,0 +1,72 @@
+ 	CREATE OR REPLACE PACKAGE EMPLOYEE_PCKG AS
+    PROCEDURE addEmployee (
+        P_ENO     IN NUMBER,
+        P_NAME    IN VARCHAR2,
+        P_DEPT_NO IN NUMBER,
+        P_SALARY  IN NUMBER
+    );
+
+    FUNCTION getSalary (
+        P_ENO IN NUMBER
+    ) RETURN NUMBER;
+
+END EMPLOYEE_PCKG;
+/
+
+CREATE OR REPLACE PACKAGE BODY EMPLOYEE_PCKG AS
+
+    PROCEDURE addEmployee (
+        P_ENO     IN NUMBER,
+        P_NAME    IN VARCHAR2,
+        P_DEPT_NO IN NUMBER,
+        P_SALARY  IN NUMBER
+    ) AS
+    BEGIN
+        INSERT INTO EMPLOYEE (
+            ENO,
+            ENAME,
+            DEPTNO,
+            SALARY
+        ) VALUES ( P_ENO,
+                   P_NAME,
+                   P_DEPT_NO,
+                   P_SALARY );
+
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Employee '
+                             || P_NAME
+                             || ' added successfully');
+    END;
+
+    FUNCTION getSalary (
+        P_ENO IN NUMBER
+    ) RETURN NUMBER AS
+        V_SALARY NUMBER;
+    BEGIN
+        SELECT
+            SALARY
+        INTO V_SALARY
+        FROM
+            EMPLOYEE
+        WHERE
+            ENO = P_ENO;
+
+        RETURN V_SALARY;
+    END;
+
+END EMPLOYEE_PCKG;
+/
+
+DECLARE
+    eno number:=&Employee_Number;
+    emp_name varchar2(100):='&Employee_Name';
+    dept_no number:=&department_number;
+    salary number:=&Salary;
+
+    v_result number;
+BEGIN
+    EMPLOYEE_PCKG.addEmployee(eno,emp_name,dept_no,salary);
+    v_result := EMPLOYEE_PCKG.getSalary(eno);
+    DBMS_OUTPUT.PUT_LINE('Employee '||eno||' Salary = ' || v_result);
+END;
+/

@@ -1,0 +1,19 @@
+Loading program COPY of length 1A into memory
+
+1000: 14
+1001: 10
+1002: 33
+1003: 48
+1004: 20
+1005: 39
+100A: 10
+100B: 10
+100C: 36
+100D: 4C
+100E: 00
+100F: 03
+1010: 00
+1011: 10
+1012: 00
+
+Jumping to location 1000

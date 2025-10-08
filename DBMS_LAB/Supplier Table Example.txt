@@ -1,0 +1,53 @@
+CREATE TABLE Item (
+    item_code      NUMBER PRIMARY KEY,
+    item_name      VARCHAR2(100),
+    qty_in_stock   NUMBER,
+    reorder_level  NUMBER
+);
+
+CREATE TABLE Supplier (
+    supplier_code   NUMBER PRIMARY KEY,
+    supplier_name   VARCHAR2(100),
+    address         VARCHAR2(200),
+    status          VARCHAR2(20) DEFAULT 'normal'
+);
+
+CREATE TABLE Can_Supply (
+    supplier_code   NUMBER REFERENCES Supplier(supplier_code),
+    item_code       NUMBER REFERENCES Item(item_code),
+    PRIMARY KEY (supplier_code, item_code)
+);
+  
+
+
+CREATE OR REPLACE FUNCTION mark_important_supplier(p_supplier_code NUMBER)
+RETURN VARCHAR2
+AS
+    v_item_count NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_item_count
+    FROM Can_Supply
+    WHERE supplier_code = p_supplier_code;
+
+    IF v_item_count > 5 THEN
+        UPDATE Supplier
+        SET status = 'important'
+        WHERE supplier_code = p_supplier_code;
+
+        RETURN 'Supplier ' || p_supplier_code || ' marked as important';
+    ELSE
+        RETURN 'Supplier ' || p_supplier_code || ' not updated (≤ 5 items)';
+    END IF;
+END;
+/
+DECLARE
+    v_result VARCHAR2(200);
+BEGIN
+    FOR supp IN (SELECT supplier_code FROM Supplier) LOOP
+        v_result := mark_important_supplier(supp.supplier_code);
+        DBMS_OUTPUT.PUT_LINE(v_result);
+    END LOOP;
+    COMMIT;
+END;
+/

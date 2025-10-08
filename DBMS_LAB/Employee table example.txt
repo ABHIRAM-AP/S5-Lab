@@ -1,0 +1,54 @@
+CREATE TABLE Employee (
+    eno      NUMBER PRIMARY KEY,
+    ename    VARCHAR2(100),
+    deptno   NUMBER,
+    salary   NUMBER
+);
+
+CREATE TABLE Employee_Tax (
+    eno        NUMBER PRIMARY KEY,
+    deptno     NUMBER,
+    tax_amount NUMBER
+);
+
+
+CREATE OR REPLACE PROCEDURE calculate_tax_all
+AS
+    v_tax NUMBER;
+BEGIN
+    -- Clear the Employee_Tax table before inserting fresh values (optional)
+    DELETE FROM Employee_Tax;
+
+    -- Loop through each employee
+    FOR emp IN (SELECT eno, salary, deptno FROM Employee) LOOP
+        -- Tax rules
+        IF emp.salary < 100000 THEN
+            v_tax := 0;
+
+        ELSIF emp.salary BETWEEN 100000 AND 150000 THEN
+            v_tax := (emp.salary - 100000) * 0.10;
+
+        ELSIF emp.salary BETWEEN 150001 AND 200000 THEN
+            v_tax := (emp.salary - 100000) * 0.20;
+
+        ELSE
+            v_tax := (emp.salary - 100000) * 0.30;
+        END IF;
+
+        -- Insert into Employee_Tax
+        INSERT INTO Employee_Tax (eno, deptno, tax_amount)
+        VALUES (emp.eno, emp.deptno, v_tax);
+
+        DBMS_OUTPUT.PUT_LINE('Inserted: Emp No ' || emp.eno || 
+                             ', Salary: ' || emp.salary || 
+                             ', Tax: ' || v_tax);
+    END LOOP;
+
+    COMMIT; -- save changes
+END;
+/
+
+BEGIN
+    calculate_tax_all;
+END;
+/

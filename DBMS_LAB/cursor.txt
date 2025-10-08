@@ -1,0 +1,21 @@
+DECLARE
+    cursor top_paid_emp is
+        select eno,ename,salary
+        from employee
+        order by salary desc;
+    total_salary number:=0;
+    emp_record top_paid_emp%ROWTYPE;
+
+BEGIN
+    OPEN top_paid_emp;
+    LOOP
+        FETCH top_paid_emp into emp_record;
+        EXIT when top_paid_emp%NOTFOUND;
+
+        dbms_output.put_line('Eno: '||emp_record.eno||', Name: '||emp_record.ename||', Salary: '||emp_record.salary);
+        total_salary := total_salary + emp_record.salary;
+    END LOOP;
+    CLOSE top_paid_emp;
+    DBMS_OUTPUT.PUT_LINE('Total Salary of Top 10 Employees: ' || total_salary);
+END;
+/ 

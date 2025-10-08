@@ -1,0 +1,68 @@
+-- Clear old data
+DELETE FROM Can_Supply;
+DELETE FROM Supplier;
+DELETE FROM Item;
+
+-- Insert Items
+INSERT INTO Item VALUES (101, 'Pen', 500, 100);
+INSERT INTO Item VALUES (102, 'Notebook', 300, 50);
+INSERT INTO Item VALUES (103, 'Pencil', 600, 150);
+INSERT INTO Item VALUES (104, 'Eraser', 200, 30);
+INSERT INTO Item VALUES (105, 'Scale', 250, 40);
+INSERT INTO Item VALUES (106, 'Marker', 150, 20);
+INSERT INTO Item VALUES (107, 'Stapler', 100, 10);
+INSERT INTO Item VALUES (108, 'File', 180, 20);
+INSERT INTO Item VALUES (109, 'Folder', 220, 25);
+INSERT INTO Item VALUES (110, 'Chalk', 400, 60);
+
+-- Insert Suppliers
+INSERT INTO Supplier (supplier_code, supplier_name, address, status)
+VALUES (201, 'Ravi Suppliers', 'Delhi', 'normal');
+
+INSERT INTO Supplier (supplier_code, supplier_name, address, status)
+VALUES (202, 'Anita Traders', 'Mumbai', 'normal');
+
+INSERT INTO Supplier (supplier_code, supplier_name, address, status)
+VALUES (203, 'Kiran Distributors', 'Chennai', 'normal');
+
+-- Insert Can_Supply (who supplies which item)
+-- Supplier 201 supplies 4 items → should remain normal
+INSERT INTO Can_Supply VALUES (201, 101);
+INSERT INTO Can_Supply VALUES (201, 102);
+INSERT INTO Can_Supply VALUES (201, 103);
+INSERT INTO Can_Supply VALUES (201, 104);
+
+-- Supplier 202 supplies 6 items → should become important
+INSERT INTO Can_Supply VALUES (202, 101);
+INSERT INTO Can_Supply VALUES (202, 102);
+INSERT INTO Can_Supply VALUES (202, 103);
+INSERT INTO Can_Supply VALUES (202, 104);
+INSERT INTO Can_Supply VALUES (202, 105);
+INSERT INTO Can_Supply VALUES (202, 106);
+
+-- Supplier 203 supplies 8 items → should become important
+INSERT INTO Can_Supply VALUES (203, 101);
+INSERT INTO Can_Supply VALUES (203, 102);
+INSERT INTO Can_Supply VALUES (203, 103);
+INSERT INTO Can_Supply VALUES (203, 104);
+INSERT INTO Can_Supply VALUES (203, 105);
+INSERT INTO Can_Supply VALUES (203, 106);
+INSERT INTO Can_Supply VALUES (203, 107);
+INSERT INTO Can_Supply VALUES (203, 108);
+
+
+
+
+-- Clear old data
+DELETE FROM Employee;
+DELETE FROM Employee_Tax;
+
+-- Insert employees
+INSERT INTO Employee VALUES (1, 'Ravi',   10,  90000);   -- Case (a) Salary < 1L → No tax
+INSERT INTO Employee VALUES (2, 'Anita',  20, 120000);   -- Case (b) Salary 1L–1.5L → 10% of (120000-100000) = 2000
+INSERT INTO Employee VALUES (3, 'Kiran',  30, 180000);   -- Case (c) Salary 1.5L–2L → 20% of (180000-100000) = 16000
+INSERT INTO Employee VALUES (4, 'Meera',  40, 220000);   -- Case (d) Salary >2L   → 30% of (220000-100000) = 36000
+INSERT INTO Employee VALUES (5, 'Arjun',  10, 250000);   -- Extra test for >2L    → 30% of (250000-100000) = 45000
+INSERT INTO Employee VALUES (6, 'Sneha',  20, 145000);   -- Case (b) Salary close to 1.5L
+INSERT INTO Employee VALUES (7, 'Vikram', 30, 199000);   -- Case (c) Salary just under 2L
+INSERT INTO Employee VALUES (8, 'Divya',  40, 300000);   -- Case (d) Very high salary

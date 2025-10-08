@@ -1,0 +1,86 @@
+-- Book Details
+CREATE TABLE BookDetail (
+    book_id     NUMBER PRIMARY KEY,
+    title       VARCHAR2(100),
+    no_of_pages NUMBER,
+    price       NUMBER
+);
+
+-- Student Table
+CREATE TABLE Student (
+    student_id  NUMBER PRIMARY KEY,
+    name        VARCHAR2(50),
+    class       VARCHAR2(20),
+    fine        NUMBER DEFAULT 0
+);
+
+-- Issue Table
+CREATE TABLE Issue (
+    issue_id    NUMBER PRIMARY KEY,
+    book_id     NUMBER REFERENCES BookDetail(book_id),
+    student_id  NUMBER REFERENCES Student(student_id),
+    issue_date  DATE,
+    return_date DATE
+);
+-- Books
+INSERT INTO BookDetail VALUES (101, 'Database Systems', 500, 500);
+INSERT INTO BookDetail VALUES (102, 'Operating Systems', 450, 400);
+INSERT INTO BookDetail VALUES (103, 'Networks', 350, 300);
+
+-- Students
+INSERT INTO Student VALUES (1, 'Ravi',  'CS-A', 0);
+INSERT INTO Student VALUES (2, 'Anita', 'CS-B', 0);
+INSERT INTO Student VALUES (3, 'Kiran', 'CS-A', 0);
+
+-- Issues (return_date is NULL initially)
+INSERT INTO Issue VALUES (1001, 101, 1, DATE '2025-06-01', NULL);
+INSERT INTO Issue VALUES (1002, 102, 2, DATE '2025-05-01', NULL);
+INSERT INTO Issue VALUES (1003, 103, 3, DATE '2025-03-01', NULL);
+
+COMMIT;
+create or replace trigger calc_fine
+after update of return_date ON issue
+for each row
+DECLARE 
+    v_price number;
+    v_days number;
+    v_fine number:=0;
+BEGIN
+    select price into v_price
+    from BOOKDETAIL
+    where book_id = :NEW.book_id;
+
+    v_days:=TRUNC(:NEW.return_date - :NEW.issue_date);
+
+     IF v_days > 90 THEN
+        v_fine := 0.20 * v_price;   
+    ELSIF v_days > 60 THEN
+        v_fine := 0.10 * v_price;  
+    ELSIF v_days > 30 THEN
+        v_fine := 0.05 * v_price;   
+    ELSE
+        v_fine := 0;
+    END IF;
+    Update STUDENT  
+    Set fine = NVL(fine,0) + v_fine
+    where student_id = :NEW.student_id;
+END;
+/
+
+UPDATE Issue
+SET return_date = DATE '2025-07-10'
+WHERE issue_id = 1001;
+
+
+UPDATE Issue
+SET return_date = DATE '2025-07-15'
+WHERE issue_id = 1002;
+
+
+UPDATE Issue
+SET return_date = DATE '2025-07-29'
+WHERE issue_id = 1003;
+
+SELECT * FROM Student;
+/
+
