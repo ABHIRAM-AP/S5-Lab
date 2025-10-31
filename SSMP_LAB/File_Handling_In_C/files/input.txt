@@ -1,0 +1,4 @@
+DATA    START   1000
+ALPHA   BYTE    C'HELLO'
+BETA    WORD    1
+  -      END     DATA

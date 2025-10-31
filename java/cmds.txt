@@ -1,0 +1,2 @@
+javac -d bin -cp ".;lib/mysql-connector-j-9.4.0.jar" src/Sample.java
+java -cp ".;bin;lib/mysql-connector-j-9.4.0.jar" Sample

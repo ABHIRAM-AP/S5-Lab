@@ -1,0 +1,3 @@
+OPCODE      HEXCODE
+LDA             00
+STL             14

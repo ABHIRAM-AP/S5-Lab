@@ -1,0 +1,45 @@
+Label=COPY     Opcode=START    Operand=1000    
+Label=EOF      Opcode=BYTE     Operand=C'EOF'  
+Label=THREE    Opcode=WORD     Operand=3       
+Label=ZERO     Opcode=WORD     Operand=0       
+Label=RETADR   Opcode=RESW     Operand=1       
+Label=LENGTH   Opcode=RESW     Operand=1       
+Label=BUFFER   Opcode=RESB     Operand=4096    
+Label=FIRST    Opcode=STL      Operand=RETADR  
+Label=CLOOP    Opcode=JSUB     Operand=RDREC   
+Opcode=LDA      Operand=LENGTH  
+Opcode=COMP     Operand=ZERO    
+Opcode=JEQ      Operand=ENDFIL  
+Opcode=JSUB     Operand=WRREC   
+Opcode=J        Operand=CLOOP   
+Label=ENDFIL   Opcode=LDA      Operand=EOF     
+Opcode=STA      Operand=BUFFER  
+Opcode=LDA      Operand=THREE   
+Opcode=STA      Operand=LENGTH  
+Opcode=JSUB     Operand=WRREC   
+Opcode=LDL      Operand=RETADR  
+Operand=RSUB    
+Label=INPUT    Opcode=BYTE     Operand=X'F1'   
+Label=MAXLEN   Opcode=WORD     Operand=4096    
+Label=RDREC    Opcode=LDX      Operand=ZERO    
+Opcode=LDA      Operand=ZERO    
+Label=RLOOP    Opcode=TD       Operand=INPUT   
+Opcode=JEQ      Operand=RLOOP   
+Opcode=RD       Operand=INPUT   
+Opcode=COMP     Operand=ZERO    
+Opcode=JEQ      Operand=EXIT    
+Opcode=STCH     Operand=BUFFER  
+Opcode=TIX      Operand=MAXLEN  
+Opcode=JLT      Operand=RLOOP   
+Label=EXIT     Opcode=STX      Operand=LENGTH  
+Operand=RSUB    
+Label=OUTPUT   Opcode=BYTE     Operand=X'05'   
+Label=WRREC    Opcode=LDX      Operand=ZERO    
+Label=WLOOP    Opcode=TD       Operand=OUTPUT  
+Opcode=JEQ      Operand=WLOOP   
+Opcode=LDCH     Operand=BUFFER  
+Opcode=WD       Operand=OUTPUT  
+Opcode=TIX      Operand=LENGTH  
+Opcode=JLT      Operand=WLOOP   
+Operand=RSUB    
+Opcode=END      Operand=FIRST   

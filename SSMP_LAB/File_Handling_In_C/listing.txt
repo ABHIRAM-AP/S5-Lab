@@ -1,0 +1,7 @@
+LOC   Label     Opcode    Operand   Object Code 
+1000  COPY      START     1000      
+1000	          LDA       ALPHA     001006      
+1003	          STL       BETA      141009      
+1006	ALPHA     WORD      1         000001      
+1009	BETA      WORD      2         000002      
+100C	          END       1000      

@@ -1,0 +1,45 @@
+Label=COPY     Opcode=START    Operand=1000     Code=--
+Label=EOF      Opcode=BYTE     Operand=C'EOF'   Code=--
+Label=THREE    Opcode=WORD     Operand=3        Code=--
+Label=ZERO     Opcode=WORD     Operand=0        Code=--
+Label=RETADR   Opcode=RESW     Operand=1        Code=--
+Label=LENGTH   Opcode=RESW     Operand=1        Code=--
+Label=BUFFER   Opcode=RESB     Operand=4096     Code=--
+Label=FIRST    Opcode=STL      Operand=RETADR   Code=14
+Label=CLOOP    Opcode=JSUB     Operand=RDREC    Code=48
+Opcode=LDA      Operand=LENGTH   Code=00
+Opcode=COMP     Operand=ZERO     Code=28
+Opcode=JEQ      Operand=ENDFIL   Code=30
+Opcode=JSUB     Operand=WRREC    Code=48
+Opcode=J        Operand=CLOOP    Code=3C
+Label=ENDFIL   Opcode=LDA      Operand=EOF      Code=00
+Opcode=STA      Operand=BUFFER   Code=0C
+Opcode=LDA      Operand=THREE    Code=00
+Opcode=STA      Operand=LENGTH   Code=0C
+Opcode=JSUB     Operand=WRREC    Code=48
+Opcode=LDL      Operand=RETADR   Code=08
+Operand=RSUB     Code=4C
+Label=INPUT    Opcode=BYTE     Operand=X'F1'    Code=--
+Label=MAXLEN   Opcode=WORD     Operand=4096     Code=--
+Label=RDREC    Opcode=LDX      Operand=ZERO     Code=04
+Opcode=LDA      Operand=ZERO     Code=00
+Label=RLOOP    Opcode=TD       Operand=INPUT    Code=E0
+Opcode=JEQ      Operand=RLOOP    Code=30
+Opcode=RD       Operand=INPUT    Code=D8
+Opcode=COMP     Operand=ZERO     Code=28
+Opcode=JEQ      Operand=EXIT     Code=30
+Opcode=STCH     Operand=BUFFER   Code=54
+Opcode=TIX      Operand=MAXLEN   Code=2C
+Opcode=JLT      Operand=RLOOP    Code=38
+Label=EXIT     Opcode=STX      Operand=LENGTH   Code=10
+Operand=RSUB     Code=4C
+Label=OUTPUT   Opcode=BYTE     Operand=X'05'    Code=--
+Label=WRREC    Opcode=LDX      Operand=ZERO     Code=04
+Label=WLOOP    Opcode=TD       Operand=OUTPUT   Code=E0
+Opcode=JEQ      Operand=WLOOP    Code=30
+Opcode=LDCH     Operand=BUFFER   Code=50
+Opcode=WD       Operand=OUTPUT   Code=DC
+Opcode=TIX      Operand=LENGTH   Code=2C
+Opcode=JLT      Operand=WLOOP    Code=38
+Operand=RSUB     Code=4C
+Opcode=END      Operand=FIRST    Code=--

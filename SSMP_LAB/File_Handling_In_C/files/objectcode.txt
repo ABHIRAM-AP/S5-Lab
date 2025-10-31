@@ -1,0 +1,6 @@
+LOC	LABEL	OPCODE	OPERAND	OBJECTCODE
+----------------------------------------------
+DATA	START	1000	1000	------
+ALPHA	BYTE	C'HELLO'	1005	------
+BETA	WORD	1	1008	------
+-	END	DATA	1008	------

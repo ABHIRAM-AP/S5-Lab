@@ -1,0 +1,7 @@
+Label   Opcode  Operand
+COPY    START   1000
+        LDA     ALPHA
+        STL     BETA
+ALPHA   WORD    1
+BETA    WORD    2   
+        END     1000

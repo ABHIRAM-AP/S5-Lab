@@ -1,0 +1,3 @@
+Label   LOC
+ALPHA   1006
+BETA    1009
